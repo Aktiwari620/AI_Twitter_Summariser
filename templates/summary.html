@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twitter Timeline Summary</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1DA1F2;
+            --dark-bg: #15202B;
+            --light-bg: #f7f9fa;
+            --text-dark: #0F1419;
+            --text-light: #FFFFFF;
+            --border: #EFF3F4;
+            --error: #E0245E;
+            --warning: #FFAD1F;
+            --success: #17BF63;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-bg);
+            color: var(--text-dark);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: var(--text-dark);
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        h1 i {
+            color: var(--primary);
+            margin-right: 12px;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            color: var(--text-dark);
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .logo {
+            color: var(--primary);
+            font-size: 24px;
+            margin-right: 10px;
+        }
+
+        .logout {
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: background-color 0.2s;
+        }
+
+        .logout:hover {
+            background-color: rgba(29, 161, 242, 0.1);
+        }
+
+        .logout i {
+            margin-right: 6px;
+        }
+
+        .summary-container {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            position: relative;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .summary-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .summary-header i {
+            color: var(--primary);
+            font-size: 24px;
+            margin-right: 10px;
+        }
+
+        .summary-header h2 {
+            margin: 0;
+            color: var(--text-dark);
+        }
+
+        .summary-content {
+            font-size: 16px;
+            line-height: 1.7;
+            color: var(--text-dark);
+            white-space: pre-wrap; /* Changed to pre-wrap to better handle HTML elements */
+        }
+
+        .summary-content strong {
+            display: block;
+            font-size: 18px;
+            color: var(--primary);
+            margin-top: 12px;
+            margin-bottom: 6px;
+        }
+
+        .summary-content blockquote {
+            margin-left: 15px;
+            padding-left: 10px;
+            border-left: 3px solid var(--primary);
+            color: #657786;
+            font-style: italic;
+        }
+
+        .summary-content a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .summary-content a:hover {
+            text-decoration: underline;
+        }
+
+        .tweet {
+            border: 1px solid var(--border);
+            padding: 20px;
+            margin-bottom: 15px;
+            background: #fff;
+            border-radius: 15px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .tweet:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .tweet p {
+            margin: 0 0 15px 0;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .tweet-meta {
+            display: flex;
+            color: #657786;
+            font-size: 0.9rem;
+            gap: 15px;
+        }
+
+        .tweet-meta span {
+            display: flex;
+            align-items: center;
+        }
+
+        .tweet-meta i {
+            margin-right: 5px;
+        }
+
+        .error {
+            color: #fff;
+            background-color: var(--error);
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .warning {
+            color: var(--text-dark);
+            background-color: rgba(255, 173, 31, 0.2);
+            border-left: 4px solid var(--warning);
+            padding: 10px 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .no-content {
+            text-align: center;
+            padding: 40px 0;
+            color: #657786;
+        }
+
+        .no-content i {
+            font-size: 48px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--primary);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #0d8ecf;
+        }
+
+        .btn i {
+            margin-right: 8px;
+        }
+
+        /* Responsive design */
+        @media (max-width: 600px) {
+            .container {
+                margin: 0;
+                border-radius: 0;
+                padding: 20px 15px;
+            }
+
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .logout {
+                margin-top: 15px;
+            }
+        }
+
+        /* Animation for loading state if needed */
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+    </style>
+    <!-- Script to convert markdown to plain text -->
+    <script>
+        function convertMarkdownToPlainText() {
+            const summaryElement = document.getElementById('summary-content');
+            if (summaryElement) {
+                let markdown = summaryElement.textContent;
+                let html = '';
+
+                // Split by lines to process line by line
+                const lines = markdown.split('\n');
+
+                for (let i = 0; i < lines.length; i++) {
+                    let line = lines[i];
+
+                    // Convert headers to bold text
+                    if (line.match(/^#+\s+/)) {
+                        line = line.replace(/^#+\s+(.*)$/, '<strong>$1</strong>');
+                    }
+
+                    // Convert bold to actual bold HTML tags
+                    line = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+                    // Convert italic to emphasis
+                    line = line.replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+                    // Convert links
+                    line = line.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>');
+
+                    // Convert blockquotes
+                    line = line.replace(/^>\s+(.*)$/, '<blockquote>$1</blockquote>');
+
+                    // Convert list items with bullets
+                    line = line.replace(/^-\s+(.*)$/, '• $1');
+
+                    // Convert numbered lists
+                    line = line.replace(/^([0-9]+)\.\s+(.*)$/, '$1. $2');
+
+                    html += line + '\n';
+                }
+
+                // Use innerHTML to render the HTML formatting while preserving line breaks
+                summaryElement.innerHTML = html;
+            }
+        }
+
+        window.onload = function() {
+            convertMarkdownToPlainText();
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fab fa-twitter"></i> Twitter Timeline Summary</h1>
+            <a href="{{ url_for('logout') }}" class="logout">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </header>
+
+        {% if timeline_error %}
+            <div class="error">
+                <strong><i class="fas fa-exclamation-circle"></i> Error Fetching Timeline:</strong> {{ timeline_error }}
+                <p><small>Note: Accessing the v2 home timeline requires Elevated or Academic access for your Twitter App. If you have Essential access, this might fail. Consider switching to the v1.1 endpoint in the code if necessary.</small></p>
+            </div>
+        {% endif %}
+
+        {% if summary %}
+            <div class="summary-container">
+                <div class="summary-header">
+                    <i class="fas fa-file-alt"></i>
+                    <h2>Timeline Summary</h2>
+                </div>
+                {% if not gemini_enabled and not timeline_error %}
+                    <div class="warning">
+                        <i class="fas fa-exclamation-triangle"></i> Summarization is disabled because the Gemini API key is not configured.
+                    </div>
+                {% endif %}
+                <!-- The summary content is stored with its original formatting -->
+                <div id="summary-content" class="summary-content">{{ summary }}</div>
+            </div>
+        {% elif not timeline_error %}
+            <div class="no-content">
+                <i class="far fa-comment-dots"></i>
+                <p>No summary could be generated from your timeline.</p>
+            </div>
+        {% endif %}
+
+        <h2><i class="fas fa-stream"></i> Recent Tweets</h2>
+        {% if tweets %}
+            {% for tweet in tweets %}
+                <div class="tweet">
+                    <p>{{ tweet.text }}</p>
+                    <div class="tweet-meta">
+                        {% if tweet.created_at %}
+                            <span><i class="far fa-clock"></i> {{ tweet.created_at }}</span>
+                        {% endif %}
+
+                        {% if tweet.public_metrics %}
+                            <span><i class="far fa-heart"></i> {{ tweet.public_metrics.like_count }}</span>
+                            <span><i class="fas fa-retweet"></i> {{ tweet.public_metrics.retweet_count }}</span>
+                        {% endif %}
+
+                        <span><i class="fas fa-hashtag"></i> {{ tweet.id }}</span>
+                    </div>
+                </div>
+            {% endfor %}
+        {% elif not timeline_error %}
+            <div class="no-content">
+                <i class="far fa-sad-tear"></i>
+                <p>No tweets found in your timeline.</p>
+            </div>
+        {% endif %}
+
+        <div class="footer">
+            <a href="/" class="btn">
+                <i class="fas fa-sync"></i> Refresh Timeline
+            </a>
+        </div>
+    </div>
+</body>
+</html>
